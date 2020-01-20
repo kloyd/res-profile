@@ -48,8 +48,8 @@ session_start();
       echo(htmlentities($row['headline']));
 
       if ($logged_in === true) {
-        echo('<a href="edit.php?auto_id='.$row['profile_id'].'">Edit</a> / ');
-        echo('<a href="delete.php?auto_id='.$row['profile_id'].'">Delete</a>');
+        echo('<a href="edit.php?profile_id='.$row['profile_id'].'">Edit</a> / ');
+        echo('<a href="delete.php?profile_id='.$row['profile_id'].'">Delete</a>');
       }
       echo("</td></tr>\n");
     }

@@ -14,55 +14,64 @@ if ( isset($_SESSION['error']) ) {
   unset($_SESSION['error']);
 }
 
-if ( isset($_POST['make']) && isset($_POST['model']) &&
-      isset($_POST['year']) && isset($_POST['mileage'])) {
+if ( isset($_POST['first_name']) && isset($_POST['last_name'])
+    && isset($_POST['email']) && isset($_POST['headline'])
+    && isset($_POST['summary'])) {
 
-  if (strlen($_POST['make']) < 1 || strlen($_POST['model']) < 1 ||
-      strlen($_POST['year']) < 1 || strlen($_POST['mileage']) < 1) {
+  if (strlen($_POST['first_name']) < 1 || strlen($_POST['last_name']) < 1 ||
+      strlen($_POST['email']) < 1 || strlen($_POST['headline']) < 1
+      || strlen($_POST['summary']) < 1) {
         $_SESSION['error'] = "All fields are required.";
         header("Location: add.php");
         return;
   }
 
-  if (is_numeric($_POST['year']) && is_numeric($_POST['mileage'])) {
-      $sql = "INSERT INTO autos (make, model, year, mileage)
-                VALUES (:make, :model, :year, :mileage)";
-      $stmt = $pdo->prepare($sql);
-      $stmt->execute(array(
-          ':make' => $_POST['make'],
-          ':model' => $_POST['model'],
-          ':year' => $_POST['year'],
-          ':mileage' => $_POST['mileage']));
-          // now redirect to view.php
-          $_SESSION['success'] = "New Auto added";
-          header('Location: index.php');
-          return;
-    } else {
-      $_SESSION['error'] = "Mileage and year must be numeric.";
-      header("Location: add.php");
-      return;
-    }
+  if (strpos($_POST['email'], '@') !== false) {
+    $stmt = $pdo->prepare('INSERT INTO Profile
+        (user_id, first_name, last_name, email, headline, summary)
+        VALUES ( :uid, :fn, :ln, :em, :he, :su)');
+
+    $stmt->execute(array(
+      ':uid' => $_SESSION['user_id'],
+      ':fn' => $_POST['first_name'],
+      ':ln' => $_POST['last_name'],
+      ':em' => $_POST['email'],
+      ':he' => $_POST['headline'],
+      ':su' => $_POST['summary'])
+    );
+    // now redirect to view.php
+    $_SESSION['success'] = "New Profile added";
+    header('Location: index.php');
+    return;
+  } else {
+    $_SESSION['error'] = "email requires @ sign.";
+    header("Location: add.php");
+    return;
+  }
 }
 
 ?>
 <html>
 <head>
 <title>Kelly Loyd's Profile Add</title>
-</head><body>
+</head>
+<body>
+  <div class="container">
   <?php echo("<h1>Adding Profile for $name</h1>\n"); ?>
-<p>Add A New Auto</p>
-<form method="post">
-  <p>Make:
-  <input type="text" name="make" size="40"></p>
-  <p>Model:
-  <input type="text" name="model" size="40"></p>
-  <p>Year:
-  <input type="text" name="year"></p>
-  <p>Mileage:
-  <input type="text" name="mileage"></p>
+  <form method="post">
+  <p>First Name:
+  <input type="text" name="first_name" size="60"/></p>
+  <p>Last Name:
+  <input type="text" name="last_name" size="60"/></p>
+  <p>Email:
+  <input type="text" name="email" size="30"/></p>
+  <p>Headline:<br/>
+  <input type="text" name="headline" size="80"/></p>
+  <p>Summary:<br/>
+  <textarea name="summary" rows="8" cols="80"></textarea>
   <p>
-    <input type="submit" value="Add New" name="addnew" />
-    <a href="index.php">Cancel</a>
+  <input type="submit" value="Add">
+  <input type="submit" name="cancel" value="Cancel">
   </p>
 </form>
 

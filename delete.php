@@ -5,41 +5,41 @@ session_start();
 if ( isset($_SESSION['name'])) {
   $name = $_SESSION['name'];
 } else {
-  die('ACCESS DENIED');
+  die('Not logged in.');
 }
 
-if ( isset($_POST['delete']) && isset($_POST['auto_id']) ) {
-    $sql = "DELETE FROM autos WHERE auto_id = :zip";
+if ( isset($_POST['delete']) && isset($_POST['profile_id']) ) {
+    $sql = "DELETE FROM profile WHERE profile_id = :zip";
     $stmt = $pdo->prepare($sql);
-    $stmt->execute(array(':zip' => $_POST['auto_id']));
+    $stmt->execute(array(':zip' => $_POST['profile_id']));
     $_SESSION['success'] = 'Record deleted';
     header( 'Location: index.php' ) ;
     return;
 }
 
 // Guardian: Make sure that auto_id is present
-if ( ! isset($_GET['auto_id']) ) {
-  $_SESSION['error'] = "Missing auto_id";
+if ( ! isset($_GET['profile_id']) ) {
+  $_SESSION['error'] = "Missing profile_id";
   header('Location: index.php');
   return;
 }
 
-$stmt = $pdo->prepare("SELECT model, make, year, auto_id FROM autos where auto_id = :xyz");
-$stmt->execute(array(":xyz" => $_GET['auto_id']));
+$stmt = $pdo->prepare("SELECT profile_id, first_name, last_name, headline from profile where profile_id = :xyz");
+$stmt->execute(array(":xyz" => $_GET['profile_id']));
 $row = $stmt->fetch(PDO::FETCH_ASSOC);
 if ( $row === false ) {
-    $_SESSION['error'] = 'Bad value for auto_id';
+    $_SESSION['error'] = 'Bad value for profile_id';
     header( 'Location: index.php' ) ;
     return;
 }
 
 ?>
-<p>Confirm: Deleting <?= $row['year'] ?>
-  <?= htmlentities($row['make']) ?>
-  <?= htmlentities($row['model']) ?></p>
+<p>Confirm: Deleting <?= htmlentities($row['first_name']) ?>
+  <?= htmlentities($row['last_name']) ?>
+  <?= htmlentities($row['headline']) ?></p>
 
 <form method="post">
-<input type="hidden" name="auto_id" value="<?= $row['auto_id'] ?>">
+<input type="hidden" name="profile_id" value="<?= $row['profile_id'] ?>">
 <input type="submit" value="Delete" name="delete">
 <a href="index.php">Cancel</a>
 </form>
