@@ -38,7 +38,11 @@ session_start();
     $stmt = $pdo->query("SELECT profile_id, first_name, last_name, headline from profile");
     $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
     echo('<table border="1">');
-    echo("<tr><td><b>Name</b></td><td><b>Headline</b></td></tr>\n");
+    echo("<tr><td><b>Name</b></td><td><b>Headline</b></td>");
+    if ($logged_in === true) {
+      echo("<td><b>Action</b></td>");
+    }
+    echo("</tr>\n");
     foreach ( $rows as $row ) {
       echo "<tr><td>";
       echo('<a href="view.php?profile_id=' . $row['profile_id'] .'">');
@@ -48,6 +52,7 @@ session_start();
       echo(htmlentities($row['headline']));
 
       if ($logged_in === true) {
+        echo("</td><td>");
         echo('<a href="edit.php?profile_id='.$row['profile_id'].'">Edit</a> / ');
         echo('<a href="delete.php?profile_id='.$row['profile_id'].'">Delete</a>');
       }
